@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Nexus Keys, a Realm of the Mad God tool.">
+        <meta name="author" content="Bert">
+        <meta name="application-name" content="NexusKeysApp">
+        <title>Nexus Keys</title>
+        <link rel="icon" href="assets/icon.png">
+        <link rel="stylesheet" href="assets/style.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="assets/jquery-3.3.1.min.js"></script>
+    </head>
+    <body>
+        <div class="popup" id="model" hidden="true">
+            <div id="popup-wrapper">
+                <div class="box">
+                    <h4>Settings</h4>
+                    <div class="content">
+                        <p>
+                            <label for="Map">Show Map</label>
+                            <input id="Map" type="checkbox" checked>
+                        </p>
+                        <p>
+                            <label for="Sounds">Sounds</label>
+                            <input id="Sounds" type="checkbox">
+                        </p>
+                        <p>
+                            <label for="Size">Keys Tracker Size</label> <br>
+                            <input id="Size" type="range" value="400" min="250" max="1000">
+                            <input id="Reset" type="button" value="Reset">
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="developers" hidden="true">
+            <div id="popup-wrapper">
+                <div class="box">
+                    <h4>Developers</h4>
+                    <div class="content" id="asite">
+                        <div class="contact">
+                            <div class="avatar">
+                                <img src="assets/icon.png">
+                            </div>
+                            <div class="contact-info">
+                                <a target="_blank" href="https://discord.gg/bDNHrwP">bert</a>
+                            </div>
+                        </div>
+                        <div class="contact">
+                            <div class="avatar">
+                                <img src="assets/e42c7b97262ace3b83bd96c07bfabc0a.webp">
+                            </div>
+                            <div class="contact-info">
+                                <a target="_blank" href="https://discord.gg/bDNHrwP">blue</a>
+                            </div>
+                        </div>
+                        <div class="contact">
+                            <div class="avatar">
+                                <img src="assets/killer.webp">
+                            </div>
+                            <div class="contact-info">
+                                <a target="_blank" href="https://discord.gg/bDNHrwP">Killer Be Killed</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <header>
+            <div class="container">
+                <div class="logo">
+                    <a href="#"><img src="assets/icon.png" width="80" height="80"></a>
+                </div>
+                <div class="text-logo"><img id="logo" src="assets/text-logo-new.png"></div>
+            </div>
+        </header>
+        <main>
+            <noscript>This site will NOT operate correctly with JavaScript disabled.</noscript>
+            <div class="box">
+                <h4>Nexus Keys Tracker
+                    <a href="#" id="settings">
+                        <img class="rotatable" src="assets/settings.png">
+                    </a>
+                </h4>
+                <div class="content">
+                    <div id="keys"></div>
+                </div>
+            </div>
+            <div class="box">
+                <h4>Player Tracker</h4>
+                <div class="content" style="">
+                    Coming when it's ready.
+                </div>
+            </div>
+        </main>
+        <footer>
+            <a href="#">Terms of Service</a> | <a id="devlink" href="#developers">Developers</a>
+        </footer>
+    </body>
+    <script>
+        
+        var audio = new Audio("assets/message1.mp3");
+        
+        var keys = document.getElementById("keys");
+        
+        var model = document.getElementById("model");
+        var panel = document.getElementById("developers");
+        
+        var Map = document.getElementById("Map");
+        
+        var sounds = document.getElementById("Sounds");
+        
+        var size = document.getElementById("Size");
+        
+        var reset = document.getElementById("Reset");
+        
+        sounds.onclick = function() {
+            var checked = sounds.checked;
+            setCookie("Sounds", checked, 30);
+        };
+        
+        Map.onclick = function() {
+            var checked = Map.checked;
+            setCookie("Map", checked, 30);
+        }
+        
+        reset.onclick = function() {
+            setSize(400);
+            size.value = 400;
+            setCookie("Size", "400", 30);
+        }
+        
+        var mouse = false;
+        
+        size.onmousedown = function() {
+            mouse = true;
+        };
+        
+        size.onmouseup = function() {
+            mouse = false;
+            setCookie("Size", size.value, 30);
+        };
+        
+        size.onmousemove = function() {
+            if (mouse) {
+                setSize(size.value);
+            }
+        };
+        
+        var devs = document.getElementById("devlink");
+        
+        devs.onclick = open_devs;
+        
+        function open_devs() {
+            panel.setAttribute("hidden", "false");
+        }
+        
+        function close_devs() {
+            panel.setAttribute("hidden", "true");
+        }
+        
+        function setSize(value) {
+            keys.style.height = value + "px";
+        }
+        
+        function load() {
+            var mv = getCookie("Map");
+            if (mv) {
+                Map.checked = mv == "true";
+            }
+            var sv = getCookie("Sounds");
+            if (sv) {
+                sounds.checked = sv == "true";
+            }
+            var sz = getCookie("Size");
+            if (sv.length > 0) {
+                setSize(sz);
+                size.value = sz;
+            }
+        }
+        
+        load();
+        
+        var image = new Image();
+        image.src = "assets/nexus.png";
+        
+        var settings = document.getElementById("settings");
+        settings.onclick = open_settings;
+        
+        function addKey(json, i) {
+            keys.insertBefore(elementFromJSON(json), keys.childNodes[0]);
+            if (keys.childNodes.length > 10) {
+                keys.removeChild(keys.childNodes[keys.childNodes.length - 1]);
+            }
+            if (i == 0 && Sounds.checked) {
+                audio.play();
+            }
+        }
+        
+        function elementFromJSON(data) {
+            var e = document.createElement("div");
+            e.classList.add("nexus-key");
+            var details = document.createElement("div");
+            details.classList.add("details");
+            details.appendChild(field("Dungeon", data.dungeon));
+            details.appendChild(field("Server", data.server));
+            details.appendChild(field("Time", data.time.split(' ')[1]));
+            e.appendChild(details);
+            if (Map.checked) {
+                var map = document.createElement("div");
+                map.classList.add("map");
+                map.appendChild(makeMap(data.map.x, data.map.y));
+                e.appendChild(map);
+            }
+            return e;
+        }
+        
+        function field(title, content) {
+            var label = document.createElement("div");
+            var text = document.createElement("div");
+            label.classList.add("field-title");
+            label.innerHTML = title;
+            text.classList.add("field-content");
+            text.innerHTML = content;
+            label.appendChild(text);
+            return label;
+        }
+        
+        function makeMap(x, y) {
+            var canvas = document.createElement("canvas");
+            canvas.width = 328;
+            canvas.height = 272;
+            var cx = canvas.getContext("2d");
+            cx.drawImage(image, 0, 0);
+            cx.fillStyle = '#0000ff';
+            cx.fillRect(x * 4, y * 4, 5, 5);
+            return canvas;
+        }
+        
+        function open_settings() {
+            model.setAttribute("hidden", "false");
+        }
+        
+        function close_settings() {
+            model.setAttribute("hidden", "true");
+        }
+        
+        $(document.body).click(function(event) {
+           if (model.getAttribute("hidden") == "false") {
+               if (event.target.id == "model") {
+                   close_settings();
+               }
+           } else if (panel.getAttribute("hidden") == "false") {
+               if (event.target.id == "developers") {
+                   close_devs();
+               }
+           }
+        });
+        
+        /**
+         * Function for setting cookies.
+         * Source: https://www.w3schools.com/js/js_cookies.asp
+         */
+        function setCookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays*24*60*60*1000));
+            var expires = "expires="+ d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+        
+        /**
+         * Function for getting cookies.
+         * Source: https://www.w3schools.com/js/js_cookies.asp
+         */
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+        
+        var after = 0;
+        
+        function fetch() {
+            setTimeout(function() {
+                $.ajax({ type: "GET",   
+                     url: "https://opiskelu.businesscollege.fi/s1700423/projects/nexus-keys/results.php?after=" + after,   
+                     async: false,
+                     cache: false,
+                     success : function(text)
+                     {
+                         if (text.length > 1) {
+                             if (text != "null") {
+                                 console.log(text);
+                                 var json = JSON.parse(text);
+								 after = json[0].after;
+                                 for(var i = json.length - 1; i >= 0; i--) {
+                                     addKey(json[i], i);
+                                 }
+                             }
+                         }
+                     }
+                });
+                fetch();
+            }, 1500);
+        }
+        
+        fetch();
+    </script>
+</html>
